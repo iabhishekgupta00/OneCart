@@ -6,7 +6,7 @@ import { TbShoppingCart } from "react-icons/tb";
 import { UserDataContext } from "../context/UserContext";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import { authDataContext } from "../context/authContext";
+import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
 import { AiFillHome } from "react-icons/ai";
 import { HiOutlineCollection } from "react-icons/hi";
