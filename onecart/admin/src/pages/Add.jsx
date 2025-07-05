@@ -6,7 +6,7 @@ import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
 import { useContext } from "react";
 import { toast } from "react-toastify";
-import Loading from "../component/loading";
+import Loading from "../component/Loading";
 
 function Add() {
 
