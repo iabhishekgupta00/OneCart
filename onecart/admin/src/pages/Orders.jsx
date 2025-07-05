@@ -8,7 +8,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { SiEbox } from "react-icons/si";
 import { toast } from "react-toastify";
-import Loading from "../component/loading";
+import Loading from "../component/Loading";
 
 function Orders() {
 
