@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react'
-import { authDataContext } from './authContext'
+import { authDataContext } from './AuthContext'
 import axios from 'axios'
 import { linkWithCredential } from 'firebase/auth'
 import { FaChampagneGlasses } from 'react-icons/fa6'
