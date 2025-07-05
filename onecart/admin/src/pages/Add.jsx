@@ -5,6 +5,8 @@ import upload from "../assets/upload.png";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
 import { useContext } from "react";
+import { toast } from "react-toastify";
+import Loading from "../component/loading";
 
 function Add() {
 
@@ -18,11 +20,13 @@ function Add() {
     const [price,setPrice] = useState("") 
     const [variety,setVariety] = useState("Shirt")
     const [bestseller,setBestseller] = useState(false)
+    const [loading,setLoading] = useState(false)
     const [sizes,setSizes] = useState([])
 
     let {serverUrl} = useContext(authDataContext)
 
     const handleAddProduct = async (e) => {
+        setLoading(true)
         e.preventDefault()
         try {
             let formData = new FormData();
@@ -43,6 +47,8 @@ function Add() {
                 {withCredentials: true})
 
                 console.log(result.data)
+                toast.success("Add Product Successfully")
+                setLoading(false)
 
                 if (result.data) {
                     setName("")
@@ -60,6 +66,8 @@ function Add() {
         } catch (error) {
 
             console.error("Error adding product:", error);
+            setLoading(false)
+            toast.error("Add Product Failed")
             
         }
 
@@ -166,7 +174,7 @@ function Add() {
                     <div className="w-[80%] flex items-center gap-[40px] flex-wrap">
                         <div className="md:w-[40%] w-full flex items-start flex-col gap-[10px]">
                             <p className="text-[20px] md:text-[25px] font-semibold w-full ">Product Category</p>
-                            <select name="" id="" className="bg-slate-600 w-full px-[10px] py-[7px] rounded-lg hover:border-[#46d1f7] border-[2px]"
+                            <select name="" id="" className="bg-slate-600 w-full px-[10px] py-[7px] text-black rounded-lg hover:border-[#46d1f7] border-[2px]"
                             onChange={(e) => setCategory(e.target.value)} >
                                 <option value="Men">Men</option>
                                 <option value="Women">Women</option>
@@ -174,7 +182,7 @@ function Add() {
                             </select>
                         </div>
                         <div className="md:w-[40%] w-full flex items-start flex-col gap-[10px]">
-                            <p className="text-[20px] md:text-[25px] font-semibold w-full whitespace-nowrap">Product Variety</p>
+                            <p className="text-[20px] md:text-[25px] font-semibold w-full blackspace-nowrap">Product Variety</p>
                             <select name="" id="" className="bg-slate-600 w-full px-[10px] py-[7px] rounded-lg hover:border-[#46d1f7] border-[2px]"
                             onChange={(e) => setVariety(e.target.value)} >
                                 <option value="Shirt">Shirt</option>
@@ -265,7 +273,11 @@ function Add() {
                        text-[black] active:bg-slate-700 active:text-[white]
                        active:border-[2px] border-[white]">
 
-                        Add Product
+                        {
+                            loading ? 
+                            <Loading/> :
+                            "All Product"
+                        }
 
                        </button>
 

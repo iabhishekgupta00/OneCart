@@ -12,6 +12,7 @@ import { AiFillHome } from "react-icons/ai";
 import { HiOutlineCollection } from "react-icons/hi";
 import { RiContactsLine } from "react-icons/ri";
 import { shopDataContext } from "../context/ShopContext";
+
 function Nav() {
     let { getCurrentUser , userData} = useContext(UserDataContext)
     let {serverUrl} = useContext(authDataContext)
@@ -74,7 +75,7 @@ function Nav() {
                 text-[white] rounded-full flex items-center
                 justify-center cursor-pointer " onClick={() => setShowProflie(prev=>!prev)}>{userData?.name.slice(0,1)}</div>}
                 <TbShoppingCart className="w-[30px] h-[30px] text-[#000000] 
-                cusrsor-pointer hidden md:block"/>
+                cusrsor-pointer hidden md:block" onClick={() => navigate("/cart")}/>
                 <p className="absolute w-[24px] h-[24px] items-center
                 justify-center bg-black px-[5px] py-[2px]
                 text-white rounded-full text-[14px] top-[8px] 
@@ -101,7 +102,7 @@ function Nav() {
                     {userData && <li className="w-[100%] hover:bg-[#2f2f2f] px-[15px]
                     py-[10px] cursor-pointer" onClick={() =>{handleLogout();setShowProflie(false)}}>LogOut</li>}
                     <li className="w-[100%] hover:bg-[#2f2f2f] px-[15px]
-                    py-[10px] cursor-pointer">My Orders</li>
+                    py-[10px] cursor-pointer"  onClick={() =>{navigate("/order");setShowProflie(false)}}>My Orders</li>
                     <li className="w-[100%] hover:bg-[#2f2f2f] px-[15px]
                     py-[10px] cursor-pointer" onClick={() => {navigate("/about");setShowProflie(false)}}>About</li>
                 </ul>
@@ -124,7 +125,8 @@ function Nav() {
                     w-[25px] h-[25px] text-[white] 
                     md:hidden"/>Contact</button>
                     <button className="text-[white] flex items-center
-                    justify-center flex-col gap-[2px] "><TbShoppingCart className="
+                    justify-center flex-col gap-[2px] "
+                    onClick={() => navigate("/cart")}><TbShoppingCart className="
                     w-[25px] h-[25px]  text-[white] 
                     md:hidden"/>Cart</button>
 

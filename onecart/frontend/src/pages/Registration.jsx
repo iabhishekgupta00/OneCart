@@ -10,6 +10,7 @@ import axios from 'axios'
 import { signInWithPopup } from 'firebase/auth';
 import { auth , provider } from '../../utils/Firebase';
 import { UserDataContext } from '../context/UserContext';
+import { toast } from 'react-toastify';
 function Registration() {
 
     let [show , setshow] = useState(false)
@@ -31,9 +32,11 @@ function Registration() {
             getCurrentUser()
             navigate("/")
             console.log(result.data)
+            toast.success("Registration SuccessFully")
             
         } catch (error) {
             console.log(error)
+            toast.error("Registration Failed")
             
         }
        }
@@ -50,9 +53,12 @@ function Registration() {
             },{withCredentials:true})
             console.log(result.data)
             getCurrentUser()
+            toast.success(" Google Registration SuccessFully")
             navigate("/")
         } catch (error) {
             console.log(error)
+             toast.error("Google Registration Failed")
+            
             
         }
        }

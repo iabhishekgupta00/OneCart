@@ -3,11 +3,15 @@ import Sidebar from "../component/Sidebar";
 import Nav from "../component/Nav";
 import { authDataContext } from "../context/AuthContext";
 import axios from "axios";
+import { toast } from "react-toastify";
+import Loading from "../component/loading";
 
 
 function Lists() {
     let [lists, setLists] = useState([])
     let {serverUrl} = useContext(authDataContext)
+    const [loading,setLoading] = useState(false)
+    
 
     const fetchLists = async () => {
         try {
@@ -23,6 +27,8 @@ function Lists() {
     const removeList = async (id) => {
         try {
             let result = await axios.post(`${serverUrl}/api/product/removeproduct/${id}`, {},{ withCredentials: true })
+            toast.success(" Product Remove Successfully")
+            setLoading(false)
 
                 if(result.data){
                     fetchLists()
@@ -32,6 +38,8 @@ function Lists() {
                 }
         } catch (error) {
             console.log(error)
+            setLoading(false)
+            toast.error("Product Remove Failed")
             
         }
         
@@ -53,41 +61,30 @@ function Lists() {
                     </div>
 
                     {
-                        lists?.length > 0 ? (
-                            lists.map((item, index) => (
-                                <div key={index} className="w-[90%] md:h-[120px] h-[90px] 
-                                bg-slate-600 rounded-xl flex items-center 
-                                justify-start gap-[5px] md:gap-[30px] 
-                                p-[10px] md:px-[30px]">
-                                    <img src={item.image1} className="w-[25%]
-                                    md:w-[120px] h-[200%] rounded-lg" alt="" />
-                                    <div className="w-[90%] h-[80%] flex 
-                                    flex-col items-start justify-center gap-[2px]">
-                                        <div className="w-[100%] md:text-[20px] text-[15px]
-                                        text-[#bef0f3]">{item.name}</div>
-                                         <div className="md:text-[17px] text-[15px]
-                                    text-[#bef0f3]">{item.category}</div>
-                                     <div className="md:text-[17px] text-[15px]
-                                    text-[#bef0f3]">₹ {item.price}</div>
-                                    </div>
-                                    <div className="w-[10%] h-[100%]
-                                    bg-transparent flex items-center justify-center">
-                                        <span className="w-[35px] h-[30%]
-                                        flex items-center justify-center rounded-md
-                                        md:hover:bg-red-300 md:hover:text-black
-                                        cursor-pointer hover:text-red-300" onClick={() => removeList(
-                                            item._id
-                                        )}>X</span>
-                                    </div>
-                                   
-                                </div>
-                            ))
-
-                        ) 
-                        : (
-                            <div className="text-white text-lg">No products found</div>
-                        )
-                    }
+    lists?.length > 0 ? (
+        lists.map((item, index) => (
+            <div key={index} className="w-[90%] h-[140px] bg-gray-slate-600 rounded-xl flex items-center justify-start gap-[5px] md:gap-[30px] p-[10px] md:px-[30px] mb-8">
+                <img src={item.image1} className="w-[120px] h-full object-cover rounded-lg" alt="" />
+                <div className="flex-1 h-full flex flex-col items-start justify-center gap-[2px] pl-4">
+                    <div className="w-full md:text-[20px] text-[15px] text-[#bef0f3]">{item.name}</div>
+                    <div className="md:text-[17px] text-[15px] text-[#bef0f3]">{item.category}</div>
+                    <div className="md:text-[17px] text-[15px] text-[#bef0f3]">₹ {item.price}</div>
+                </div>
+                <div className="w-[10%] h-full bg-transparent flex items-center justify-center">
+                    <span className="w-[35px] h-[35px] flex items-center justify-center rounded-md md:hover:bg-red-300 md:hover:text-black cursor-pointer hover:text-red-300" onClick={() => removeList(item._id)}>
+                        {
+                            loading ? 
+                            <Loading/> :
+                            "X"
+                        }</span>
+                </div>
+            </div>
+        ))
+    ) 
+    : (
+        <div className="text-white text-lg">No products found</div>
+    )
+}
                 </div>
             </div>
   

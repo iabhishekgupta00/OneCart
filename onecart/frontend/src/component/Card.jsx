@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { shopDataContext } from '../context/ShopContext'
 import { useNavigate } from 'react-router-dom'
+import CartTotal from './CartTotal'
 
 
 function Card ({name , image ,  id , price}) {
@@ -18,6 +19,8 @@ function Card ({name , image ,  id , price}) {
             <div className='text-[#c3f6fa] text-[18px] py-[10px]
             '>{name}</div>
             <div className='text-[#c3f6fa] text-[14px]'>{currency} {price}</div>
+
+           
 
         </div>
     )

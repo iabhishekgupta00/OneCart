@@ -10,6 +10,7 @@ import axios from 'axios'
 import { signInWithPopup } from 'firebase/auth';
 import { auth , provider } from '../../utils/Firebase';
 import { UserDataContext } from '../context/UserContext.jsx';
+import { toast } from 'react-toastify';
 function Login() {
     let [show , setshow] = useState(false)
     let [email,setEmail] = useState("")
@@ -27,16 +28,20 @@ function Login() {
             let result = await axios.post(serverUrl + '/api/auth/login',{
                 email,password
             },{withCredentials:true})
+            
             // Save token to localStorage before anything else
             if (result.data && result.data.token) {
                 localStorage.setItem("token", result.data.token);
             }
             console.log(result.data)
+            toast.success("Login SuccessFully")
             await getCurrentUser()
             navigate("/")
             
         } catch (error) {
             console.log(error)
+            toast.error("Login Failed")
+            
             
         }
 
@@ -52,15 +57,19 @@ function Login() {
             const result = await axios.post(serverUrl + "/api/auth/googlelogin" ,{
                 name, email
             },{withCredentials:true})
+            
             // Save token to localStorage before anything else
             if (result.data && result.data.token) {
                 localStorage.setItem("token", result.data.token);
             }
             console.log(result.data)
+            toast.success("Google Login SuccessFully")
             await getCurrentUser()
             navigate("/")
         } catch (error) {
             console.log(error)
+            toast.error("Google Login Failed")
+            
         }
        }
     return (
