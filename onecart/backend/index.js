@@ -28,7 +28,19 @@ app.use("/api/order",orderRoutes)
 
 
 
-app.listen(port,()=>{
-    console.log("Hello From Server")
+app.listen(port, '0.0.0.0', () => {
+  console.log("Hello From Server")
     connectDb()
+  .then(() => {
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`Server running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Database connection failed", err);
+  });
+
+  
 })
+
+
