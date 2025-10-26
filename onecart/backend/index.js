@@ -16,7 +16,7 @@ let app = express()
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin:["https://onecart-frontendo.onrender.com" , "https://onecart-admin-9yr2.onrender.com"],
+    origin:["https://onecart-frontendo.onrender.com", "https://onecart-admin-9yr2.onrender.com", "http://localhost:5173"],
     credentials:true
 }))
 
@@ -28,9 +28,7 @@ app.use("/api/order",orderRoutes)
 
 
 
-app.listen(port, '0.0.0.0', () => {
-  console.log("Hello From Server")
-    connectDb()
+connectDb()
   .then(() => {
     app.listen(port, '0.0.0.0', () => {
       console.log(`Server running on port ${port}`);
@@ -39,8 +37,5 @@ app.listen(port, '0.0.0.0', () => {
   .catch((err) => {
     console.error("Database connection failed", err);
   });
-
-  
-})
 
 
