@@ -24,49 +24,102 @@ function Login() {
 
        const handleLogin = async (e) => {
         e.preventDefault()
+        console.log('Login attempt initiated for email:', email);
         try {
+            console.log('Sending login request to:', serverUrl + '/api/auth/login');
             let result = await axios.post(serverUrl + '/api/auth/login',{
                 email,password
             },{withCredentials:true})
             
+            console.log('Login response received:', {
+                status: result.status,
+                hasToken: !!result.data?.token,
+                userData: result.data?.user ? 'Present' : 'Missing'
+            });
+
             // Save token to localStorage before anything else
             if (result.data && result.data.token) {
                 localStorage.setItem("token", result.data.token);
+                console.log('Token successfully stored in localStorage');
+            } else {
+                console.warn('No token received in login response');
             }
             toast.success("Login SuccessFully")
+            console.log('Fetching current user data...');
             await getCurrentUser()
+            console.log('Navigation to home page...');
             navigate("/")
             
         } catch (error) {
-            console.log(error)
-            toast.error("Login Failed")
+            console.error('Login Error:', {
+                message: error.message,
+                status: error.response?.status,
+                statusText: error.response?.statusText,
+                responseData: error.response?.data,
+                requestURL: error.config?.url,
+                requestData: error.config?.data
+            });
+            toast.error(`Login Failed: ${error.response?.data?.message || error.message}`)
         }
 
         
        }
        const googleLogin = async () => {
         try {
+            console.log('Initiating Google login popup...');
             const response = await signInWithPopup(auth , provider)
             let user = response.user
+            console.log('Google authentication successful:', {
+                hasDisplayName: !!user.displayName,
+                hasEmail: !!user.email,
+                isEmailVerified: user.emailVerified
+            });
+
             let name = user.displayName;
             let email = user.email
+
+            console.log('Sending Google login data to backend:', {
+                endpoint: serverUrl + "/api/auth/googleLogin",
+                userData: { name, email }
+            });
 
             const result = await axios.post(serverUrl + "/api/auth/googleLogin" ,{
                 name, email
             },{withCredentials:true})
             
+            console.log('Backend Google login response:', {
+                status: result.status,
+                hasToken: !!result.data?.token,
+                userData: result.data?.user ? 'Present' : 'Missing'
+            });
+
             // Save token to localStorage before anything else
             if (result.data && result.data.token) {
                 localStorage.setItem("token", result.data.token);
+                console.log('Google login token stored in localStorage');
+            } else {
+                console.warn('No token received from Google login response');
             }
-            console.log(result.data)
+
             toast.success("Google Login SuccessFully")
+            console.log('Fetching current user data after Google login...');
             await getCurrentUser()
+            console.log('Navigating to home page after Google login...');
             navigate("/")
         } catch (error) {
-            console.log(error)
-            toast.error("Google Login Failed")
+            console.error('Google Login Error:', {
+                message: error.message,
+                isFirebaseError: error.code ? true : false,
+                firebaseErrorCode: error.code,
+                status: error.response?.status,
+                responseData: error.response?.data,
+                stack: error.stack
+            });
             
+            const errorMessage = error.code 
+                ? `Google Login Failed: ${error.code}` 
+                : `Google Login Failed: ${error.response?.data?.message || error.message}`;
+            toast.error(errorMessage);
         }
        }
     return (

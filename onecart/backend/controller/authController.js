@@ -51,36 +51,71 @@ export const registration = async (req,res) => {
 
 export const login = async (req,res) => {
     try {
+        // Log incoming request details
         console.log('Login attempt received:', { 
             body: req.body,
-            headers: req.headers
+            headers: {
+                'content-type': req.headers['content-type'],
+                'origin': req.headers['origin'],
+                'cookie': req.headers['cookie'] ? 'Present' : 'Missing'
+            },
+            ip: req.ip,
+            method: req.method
         });
+
+        // Validate request body
+        if (!req.body || !req.body.email || !req.body.password) {
+            console.error('Invalid request body:', {
+                hasBody: !!req.body,
+                hasEmail: !!req.body?.email,
+                hasPassword: !!req.body?.password
+            });
+            return res.status(400).json({message: "Missing email or password"});
+        }
 
         let {email,password} = req.body;
         // Convert email to lowercase for consistency
         const normalizedEmail = email.toLowerCase();
-        console.log('Searching for user with normalized email:', normalizedEmail);
+        console.log('Processing login for email:', normalizedEmail);
         
+        // Find user
         let user = await User.findOne({email: normalizedEmail})
         if(!user){
-            console.log('User not found with email:', email);
+            console.log('Authentication failed: User not found:', {
+                attemptedEmail: normalizedEmail,
+                timestamp: new Date().toISOString()
+            });
             return res.status(404).json({message:"User is not Found"})
         }
-        console.log('User found:', { userId: user._id, email: user.email });
+        console.log('User found:', { 
+            userId: user._id, 
+            email: user.email,
+            hasPassword: !!user.password,
+            accountCreated: user.createdAt
+        });
 
-        console.log('Comparing passwords...');
+        // Verify password
+        console.log('Verifying password...');
         let isMatch = await bcrypt.compare(password,user.password)
         if(!isMatch){
-            console.log('Password mismatch for user:', email);
+            console.log('Authentication failed: Invalid password:', {
+                userId: user._id,
+                timestamp: new Date().toISOString()
+            });
             return res.status(400).json({message:"Incorrect password"})
         }
-        console.log('Password matched successfully');
+        console.log('Password verification successful');
 
-        console.log('Generating token...');
+        // Generate token
+        console.log('Generating authentication token...');
         let token = await genToken(user._id)
-        console.log('Token generated successfully');
+        console.log('Token generated successfully:', {
+            userId: user._id,
+            tokenGenerated: !!token
+        });
 
-        console.log('Setting cookie...');
+        // Set cookie
+        console.log('Setting authentication cookie...');
         res.cookie("token",token,{
             httpOnly:true,
             secure:true,
@@ -89,11 +124,26 @@ export const login = async (req,res) => {
         })
         console.log('Cookie set successfully');
 
-        console.log('Sending successful response');
-        return res.status(201).json({ user, token })
+        // Send response
+        console.log('Login successful, sending response');
+        return res.status(201).json({ 
+            user: {
+                _id: user._id,
+                email: user.email,
+                name: user.name
+            }, 
+            token 
+        })
     } catch (error) {
-        console.log("login error")
-        return res.status(500).json({message: `login error ${error}`})
+        console.error('Login error:', {
+            errorMessage: error.message,
+            errorStack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+        return res.status(500).json({
+            message: "Internal server error during login",
+            details: error.message
+        })
     }
 }
 export const logOut = async (req,res) => {
