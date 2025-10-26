@@ -33,7 +33,6 @@ function Login() {
             if (result.data && result.data.token) {
                 localStorage.setItem("token", result.data.token);
             }
-            console.log(result.data)
             toast.success("Login SuccessFully")
             await getCurrentUser()
             navigate("/")
@@ -41,8 +40,6 @@ function Login() {
         } catch (error) {
             console.log(error)
             toast.error("Login Failed")
-            
-            
         }
 
         
@@ -54,7 +51,7 @@ function Login() {
             let name = user.displayName;
             let email = user.email
 
-            const result = await axios.post(serverUrl + "/api/auth/googlelogin" ,{
+            const result = await axios.post(serverUrl + "/api/auth/googleLogin" ,{
                 name, email
             },{withCredentials:true})
             

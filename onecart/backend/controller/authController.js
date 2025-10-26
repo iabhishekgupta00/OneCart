@@ -5,20 +5,35 @@ import { genToken, genToken1 } from "../config/token.js";
 
 export const registration = async (req,res) => {
     try {
+        console.log('Registration attempt received:', req.body);
         const {name , email , password} = req.body;
-        const existUser = await User.findOne({email})
+        
+        // Convert email to lowercase for consistency
+        const normalizedEmail = email.toLowerCase();
+        
+        console.log('Checking if user exists with email:', normalizedEmail);
+        const existUser = await User.findOne({email: normalizedEmail})
         if(existUser){
-            return res.status(400).json({message:"User already exist"})
+            console.log('User already exists with email:', normalizedEmail);
+            return res.status(400).json({message:"User already exists"})
         }
-        if(!validator.isEmail(email)){
+        if(!validator.isEmail(normalizedEmail)){
+            console.log('Invalid email format:', normalizedEmail);
             return res.status(400).json({message:"Enter Valid Email"})
         }
         if(password.length < 8){
+            console.log('Password too short');
             return res.status(400).json({message:"Enter strong Password"})
         }
+        console.log('Hashing password...');
         let hashPassword = await bcrypt.hash(password,10)
 
-        const user = await User.create({name,email,password:hashPassword})
+        console.log('Creating new user...');
+        const user = await User.create({
+            name,
+            email: normalizedEmail,
+            password: hashPassword
+        })
         let token = await genToken(user._id)
         res.cookie("token",token,{
             httpOnly:true,
@@ -36,22 +51,45 @@ export const registration = async (req,res) => {
 
 export const login = async (req,res) => {
     try {
+        console.log('Login attempt received:', { 
+            body: req.body,
+            headers: req.headers
+        });
+
         let {email,password} = req.body;
-        let user = await User.findOne({email})
+        // Convert email to lowercase for consistency
+        const normalizedEmail = email.toLowerCase();
+        console.log('Searching for user with normalized email:', normalizedEmail);
+        
+        let user = await User.findOne({email: normalizedEmail})
         if(!user){
+            console.log('User not found with email:', email);
             return res.status(404).json({message:"User is not Found"})
         }
+        console.log('User found:', { userId: user._id, email: user.email });
+
+        console.log('Comparing passwords...');
         let isMatch = await bcrypt.compare(password,user.password)
         if(!isMatch){
+            console.log('Password mismatch for user:', email);
             return res.status(400).json({message:"Incorrect password"})
         }
+        console.log('Password matched successfully');
+
+        console.log('Generating token...');
         let token = await genToken(user._id)
+        console.log('Token generated successfully');
+
+        console.log('Setting cookie...');
         res.cookie("token",token,{
             httpOnly:true,
             secure:true,
             sameSite:"none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
+        console.log('Cookie set successfully');
+
+        console.log('Sending successful response');
         return res.status(201).json({ user, token })
     } catch (error) {
         console.log("login error")

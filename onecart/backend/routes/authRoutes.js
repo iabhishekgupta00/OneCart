@@ -13,6 +13,17 @@ authRoutes.post("/googleLogin",googleLogin)
 authRoutes.get("/getCurrentUser",authenticate, getCurrentUser)
 authRoutes.post("/adminLogin",adminLogin)
 
+// Temporary route to check registered users - REMOVE IN PRODUCTION
+authRoutes.get("/check-users", async (req, res) => {
+    try {
+        const users = await User.find({}, 'email name');
+        console.log('Registered users:', users);
+        res.json(users);
+    } catch (error) {
+        console.error('Error checking users:', error);
+        res.status(500).json({ message: 'Error checking users' });
+    }
+});
 
 
 export default authRoutes
